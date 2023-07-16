@@ -1,25 +1,23 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using NorthWindWeb_Demo.BLL.Instances;
+using NorthWindWeb_Demo.BLL.Interfaces;
 using NorthWindWeb_Demo.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
-//builder.Services.AddSqlServer
-var t = builder.Configuration.GetConnectionString("DefaultConnectionString");
+
 builder.Services.AddDbContext<DataBaseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
 });
-var app = builder.Build();
 
-app.MapGet("/", async (DataBaseContext db) =>
-{
-    var result = await db.Employees.ToListAsync();
-    return result;
-});
+builder.Services.AddScoped<IEmployeeManagement, EmployeeManagement>();
+var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
@@ -35,8 +33,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
-app.MapRazorPages();
-
+app.MapControllers();
 app.Run();
